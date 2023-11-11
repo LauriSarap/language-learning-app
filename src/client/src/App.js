@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import './App.css';
+import axios from 'axios';
+const server_api_url = process.env.SERVER_API_URL;
+require('dotenv').config();
 
 function App() {
   const [messages, setMessages] = useState([]);
@@ -8,18 +11,26 @@ function App() {
   const sendMessage = async () => {
     if (!input) return;
 
-    // Add user message to messages array
     const updatedMessages = [...messages, { text: input, sender: 'user' }];
 
-    // TODO: Send 'input' to your backend and get the response from OpenAI
-    // TODO: Add AI response to message array
+    try {
 
-    // AI response example for testing purposes
-    const aiResponse = `Simulated response for: ${input}`;
-    updatedMessages.push({ text: aiResponse, sender: 'ai' });
+      // Send input to backend
+      const response = await axios.post(server_api_url, {
+        messages: [{role: "user", content: input}]
+      });
 
-    // Update the state with new messages array
-    setMessages(updatedMessages)
+      // Extracting AI response from the response data
+      const aiResponse = response.data.choices[0].message.content;
+      updatedMessages.push({text: aiResponse, sender:'ai'});
+
+    } catch (error){
+      console.error('Error sending message:', error)
+      updatedMessages.push({ text: "Error getting response.", sender: 'ai' });
+    }
+
+    // State update with new messages array
+    setMessages(updatedMessages);
 
     // Clear input after sending
     setInput('');
@@ -32,7 +43,7 @@ function App() {
            {messages.map((message, index) => (
                <div key={index} className={`message ${message.sender}`}>
                  <img
-                     src={message.sender === 'user' ? 'public/usericon.png' : 'public/aiicon.png'}
+                     src={message.sender === 'user' ? '/usericon.jpg' : '/aiicon.png'}
                      alt={message.sender}
                      className="profile-icon"
                  />

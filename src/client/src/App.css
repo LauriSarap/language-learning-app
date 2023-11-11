@@ -14,12 +14,13 @@
   display: flex;
   flex-direction: column;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  overflow-x: hidden;
 }
 
 .messages{
   flex-grow: 1;
   overflow-y: auto;
-  padding: 10px;
+  padding: 5px;
 }
 
 .message{
@@ -28,7 +29,7 @@
   margin: 5px;
   padding: 10px;
   border-radius: 10px;
-  width: 100%;
+  max-width: 100%;
 }
 
 .message.user{
@@ -42,9 +43,9 @@
 }
 
 .profile-icon {
-  width: 30px; /* Adjust size as needed */
-  height: 30px; /* Adjust size as needed */
-  margin-right: 10px; /* Space between icon and text */
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
 }
 
 .input-area{
