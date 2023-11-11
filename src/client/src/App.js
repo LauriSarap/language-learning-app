@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './App.css';
-import {set} from "express/lib/application";
 
 function App() {
   const [messages, setMessages] = useState([]);
@@ -32,7 +31,12 @@ function App() {
          <div className="messages">
            {messages.map((message, index) => (
                <div key={index} className={`message ${message.sender}`}>
-                 {message.text}
+                 <img
+                     src={message.sender === 'user' ? 'public/usericon.png' : 'public/aiicon.png'}
+                     alt={message.sender}
+                     className="profile-icon"
+                 />
+                 <span className="message-text">{message.text}</span>
                </div>
            ))}
          </div>
