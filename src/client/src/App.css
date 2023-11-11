@@ -6,6 +6,11 @@
   background-color: #f0f0f0;
 }
 
+.dev-mode-toggle{
+  text-align: center;
+  margin-bottom: 10px;
+}
+
 .chatbox{
   width: 60%;
   height: 70%;
