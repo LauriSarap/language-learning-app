@@ -8,6 +8,8 @@ function App() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [devMode, setDevMode] = useState(false);
+  const eventSource = useRef(null)
+  const messagesEndRef = useRef(null);
 
   function convertNewlinesToJSX(text) {
     return text.split('\n').map((line, index, array) => (
@@ -15,13 +17,32 @@ function App() {
     ));
   }
 
-  const messagesEndRef = useRef(null);
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
   useEffect(() => {
-    scrollToBottom(); // Scroll to bottom whenever messages change
-  }, [messages]);
+    // Establishing SSE connection
+    eventSource.current = new EventSource(`${server_api_url}/stream`);
+    eventSource.current.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      setMessages(prevMessages => [...prevMessages, { text: data.content, sender: 'ai' }]);
+    };
+
+    eventSource.current.onerror = (error) => {
+      console.error('EventSource failed:', error);
+      eventSource.current.close();
+    };
+
+    // Clean up when unmounting
+    scrollToBottom();
+    return () =>{
+      if (eventSource.current){
+        eventSource.current.close();
+      }
+    }
+
+  }, []);
 
   const sendMessage = async () => {
     if (!input) return;
@@ -37,7 +58,7 @@ function App() {
     else {
       try {
         // Send input to backend
-        const response = await axios.post(`${server_api_url}/chat`, {
+        /*const response = */await axios.post(`${server_api_url}/stream`, {
           messages: [{role: "user", content: user_message}]
         })
             .catch(error => {
@@ -46,7 +67,7 @@ function App() {
             });
 
         // Extracting AI response from the response data
-        const aiResponse = response.data.choices[0].message.content;
+        //const aiResponse = response.data.choices[0].message.content;
         setMessages(prevMessages => [...prevMessages, { text: aiResponse, sender: 'ai' }]);
 
       } catch (error){
